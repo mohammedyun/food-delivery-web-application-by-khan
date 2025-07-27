@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Cart - FoodFromKhan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">🛒 Your Cart</h2>
+
+  {% if cart %}
+  <div class="row">
+    {% for item in cart %}
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <img src="{{ item.image }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ item.title }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ item.title }}</h5>
+          <p class="card-text">Price: ₹{{ item.price }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4">
+    <h4>Total: ₹{{ total }}</h4>
+    <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg mt-2">Proceed to Checkout</a>
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center">
+    Your cart is empty. <a href="{{ url_for('menu') }}">Browse Menu</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

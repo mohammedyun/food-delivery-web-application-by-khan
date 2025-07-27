@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}My Recent Orders{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Recent Orders</h2>
+  {% for order in orders %}
+    <div class="card shadow-sm mb-4 p-3">
+      <h5>Order #{{ order.id }} - ₹{{ order.total }}</h5>
+      <p><strong>Status:</strong> <span class="badge bg-success">{{ order.status }}</span></p>
+      <p><strong>Address:</strong> {{ order.address }}</p>
+      <h6>Items:</h6>
+      <div class="row">
+       {% for item in order["items_list"] %}
+        <div class="col-md-3 text-center">
+          <img src="{{ item.image }}" alt="{{ item.title }}" class="img-fluid rounded" style="height: 100px;">
+          <p>{{ item.title }}<br><small>₹{{ item.price }}</small></p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

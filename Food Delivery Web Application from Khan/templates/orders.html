@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}All Orders - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 animate__animated animate__fadeInDown">📦 All Orders (Admin)</h2>
+
+    <div class="mb-4">
+        <a href="{{ url_for('export_csv') }}" class="btn btn-success me-2">⬇️ Export CSV</a>
+        <a href="{{ url_for('export_pdf') }}" class="btn btn-danger">⬇️ Export PDF</a>
+    </div>
+
+    {% for order in orders %}
+    <div class="card mb-4 shadow-sm p-4 animate__animated animate__fadeInUp">
+        <h5><strong>Name:</strong> {{ order.name }}</h5>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Total:</strong> ₹{{ order.total }}</p>
+        <p><strong>Status:</strong> <span class="badge bg-info">{{ order.status }}</span></p>
+
+        <h6><strong>Items:</strong></h6>
+        <div class="row">
+          {% for item in order["items_list"] %}
+            <div class="col-md-3 text-center">
+                <img src="{{ item.image }}" alt="{{ item.title }}" class="img-fluid rounded mb-2" style="height: 120px;">
+                <p>{{ item.title }}<br><small>₹{{ item.price }}</small></p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-secondary mt-3">🔍 View Details</a>
+        <button class="btn btn-primary mt-3" onclick="trackDelivery('{{ order.address }}', '{{ loop.index }}')">📍 Track Delivery</button>
+        <div id="map-{{ loop.index }}" class="mt-3 map-container" style="height: 300px; display: none;"></div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+const maps = {};
+
+function trackDelivery(address, index) {
+    const mapId = `map-${index}`;
+    const mapDiv = document.getElementById(mapId);
+    mapDiv.style.display = 'block';
+
+    if (maps[index]) {
+        maps[index].remove();
+    }
+
+    fetch(`/geocode?address=${encodeURIComponent(address)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.lat && data.lng) {
+                const map = L.map(mapId).setView([data.lat, data.lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+                L.marker([data.lat, data.lng]).addTo(map)
+                    .bindPopup("📍 Delivery Location")
+                    .openPopup();
+                maps[index] = map;
+            } else {
+                alert("❌ Location not found.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("❌ Failed to load map.");
+        });
+}
+</script>
+{% endblock %}

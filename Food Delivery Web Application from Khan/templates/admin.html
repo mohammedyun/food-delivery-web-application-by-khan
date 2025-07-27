@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Panel</h2>
+
+<h3>Add New Menu Item</h3>
+<form method="POST">
+    <input type="text" name="name" placeholder="Food Name" required>
+    <input type="number" name="price" step="0.01" placeholder="Price" required>
+    <button type="submit">Add Item</button>
+</form>
+
+<h3>Current Menu</h3>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>ID</th>
+        <th>Item</th>
+        <th>Price (₹)</th>
+        <th>Action</th>
+    </tr>
+    {% for item in menu %}
+    <tr>
+        <td>{{ item[0] }}</td>
+        <td>{{ item[1] }}</td>
+        <td>{{ item[2] }}</td>
+        <td><a href="{{ url_for('delete_item', item_id=item[0]) }}" onclick="return confirm('Are you sure?')">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{{ url_for('menu') }}">← Back to Menu</a>
+{% endblock %}
